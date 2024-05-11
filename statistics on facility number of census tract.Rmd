@@ -1,0 +1,245 @@
+---
+title: "Statistics on facility number of  census tract"
+output: html_document
+date: "2024-05-10"
+---
+
+
+```{r}
+install.packages("sf")
+```
+```{r}
+require(sf)
+```
+
+```{r}
+require(dplyr)
+```
+```{r}
+censustract <- st_read("/Users/guanxi/Desktop/Final Project/tl_2023_06_tract/tl_2023_06_tract.shp")
+```
+```{r}
+sustenance2 <- st_read("/Users/guanxi/Desktop/Final Project/sustenance2.shp")
+```
+```{r}
+sustenance1 <- st_read("/Users/guanxi/Desktop/Final Project/sustenance1.shp")
+```
+```{r}
+censustract <- st_transform(censustract,4326)
+sustenance1 <- st_transform(sustenance1,4326)
+```
+```{r}
+sustenance2 <- st_transform(sustenance2,4326)
+```
+
+```{r}
+joined_data_sustenance1 <- st_join(censustract, sustenance1)
+```
+```{r}
+joined_data_sustenance2 <- st_join(censustract, sustenance2)
+```
+
+```{r}
+sustenance_result1 <- joined_data_sustenance1 %>%
+  group_by(GEOID) %>%
+  summarize(num_sustenance = n())
+
+```
+
+
+```{r}
+sustenance_result2 <- joined_data_sustenance2 %>%
+  group_by(GEOID) %>%
+  summarize(num_sustenance = n())
+
+```
+```{r}
+sustenance_result1 <- st_drop_geometry(sustenance_result1)
+sustenance_result2 <- st_drop_geometry(sustenance_result2)
+```
+
+```{r}
+sustenance_result <- merge(sustenance_result1, sustenance_result2, by = "GEOID",all = TRUE)
+```
+```{r}
+sustenance_result$sustenance <- sustenance_result$num_sustenance.x+sustenance_result$num_sustenance.y
+```
+```{r}
+poi <-data.frame(GEOID = sustenance_result$GEOID, sustenance=sustenance_result$sustenance)
+```
+
+
+```{r}
+entertainment2 <- st_read("/Users/guanxi/Desktop/Final Project/entertainment2.shp")
+entertainment1 <- st_read("/Users/guanxi/Desktop/Final Project/entertainment1.shp")
+```
+```{r}
+entertainment1 <-st_transform(entertainment1,4326)
+entertainment2 <- st_transform(entertainment2,4326)
+```
+
+
+```{r}
+joined_data_entertainment1 <- st_join(censustract, entertainment1)
+```
+```{r}
+joined_data_entertainment2 <- st_join(censustract, entertainment2)
+```
+
+```{r}
+entertainment_result2 <- joined_data_entertainment2 %>%
+  group_by(GEOID) %>%
+  summarize(num_sustenance = n())
+
+entertainment_result1 <- joined_data_entertainment1 %>%
+  group_by(GEOID) %>%
+  summarize(num_sustenance = n())
+
+```
+```{r}
+entertainment_result1 <- st_drop_geometry(entertainment_result1)
+entertainment_result2 <- st_drop_geometry(entertainment_result2)
+```
+
+```{r}
+entertainment_result <- merge(entertainment_result1, entertainment_result2, by = "GEOID",all = TRUE)
+```
+```{r}
+entertainment_result$entertainment <- entertainment_result$num_sustenance.x+entertainment_result$num_sustenance.y
+```
+```{r}
+entertainment_result <-select(entertainment_result,-num_sustenance.x,-num_sustenance.y)
+```
+
+```{r}
+poi <-merge(poi,entertainment_result,by = "GEOID",all = TRUE)
+```
+
+```{r}
+health2 <- st_read("/Users/guanxi/Desktop/Final Project/health2.shp")
+health1 <- st_read("/Users/guanxi/Desktop/Final Project/health1.shp")
+```
+```{r}
+health1 <-st_transform(health1,4326)
+health2 <- st_transform(health2,4326)
+```
+```{r}
+joined_data_health1 <- st_join(censustract, health1)
+
+joined_data_health2 <- st_join(censustract, health2)
+
+health_result2 <- joined_data_health2 %>%
+  group_by(GEOID) %>%
+  summarize(num_sustenance = n())
+
+health_result1 <- joined_data_health1 %>%
+  group_by(GEOID) %>%
+  summarize(num_sustenance = n())
+
+```
+```{r}
+health_result1 <- st_drop_geometry(health_result1)
+health_result2 <- st_drop_geometry(health_result2)
+```
+
+```{r}
+health_result <- merge(health_result1, health_result2, by = "GEOID",all = TRUE)
+```
+```{r}
+health_result$health <- health_result$num_sustenance.x+health_result$num_sustenance.y
+```
+```{r}
+health_result <-select(health_result,-num_sustenance.x,-num_sustenance.y)
+```
+
+```{r}
+poi <-merge(poi,health_result,by = "GEOID",all = TRUE)
+```
+
+```{r}
+financial2 <- st_read("/Users/guanxi/Desktop/Final Project/financial2.shp")
+financial1 <- st_read("/Users/guanxi/Desktop/Final Project/financial1.shp")
+```
+```{r}
+financial1 <-st_transform(financial1,4326)
+financial2 <- st_transform(financial2,4326)
+```
+```{r}
+joined_data_financial1 <- st_join(censustract, financial1)
+
+joined_data_financial2 <- st_join(censustract, financial2)
+
+financial_result2 <- joined_data_financial2 %>%
+  group_by(GEOID) %>%
+  summarize(num_sustenance = n())
+
+financial_result1 <- joined_data_financial1 %>%
+  group_by(GEOID) %>%
+  summarize(num_sustenance = n())
+
+```
+```{r}
+financial_result1 <- st_drop_geometry(financial_result1)
+financial_result2 <- st_drop_geometry(financial_result2)
+```
+
+```{r}
+financial_result <- merge(financial_result1, financial_result2, by = "GEOID",all = TRUE)
+```
+```{r}
+financial_result$financial <- financial_result$num_sustenance.x+financial_result$num_sustenance.y
+```
+```{r}
+financial_result <-select(financial_result,-num_sustenance.x,-num_sustenance.y)
+```
+
+```{r}
+poi <-merge(poi,financial_result,by = "GEOID",all = TRUE)
+```
+```{r}
+edu2 <- st_read("/Users/guanxi/Desktop/Final Project/edu2.shp")
+edu1 <- st_read("/Users/guanxi/Desktop/Final Project/edu1.shp")
+```
+```{r}
+edu1 <-st_transform(edu1,4326)
+edu2 <- st_transform(edu2,4326)
+```
+```{r}
+joined_data_edu1 <- st_join(censustract, edu1)
+
+joined_data_edu2 <- st_join(censustract, edu2)
+
+edu_result2 <- joined_data_edu2 %>%
+  group_by(GEOID) %>%
+  summarize(num_sustenance = n())
+
+edu_result1 <- joined_data_edu1 %>%
+  group_by(GEOID) %>%
+  summarize(num_sustenance = n())
+
+```
+```{r}
+edu_result1 <- st_drop_geometry(edu_result1)
+edu_result2 <- st_drop_geometry(edu_result2)
+```
+
+```{r}
+edu_result <- merge(edu_result1, edu_result2, by = "GEOID",all = TRUE)
+```
+```{r}
+edu_result$edu <- edu_result$num_sustenance.x+edu_result$num_sustenance.y
+```
+```{r}
+edu_result <-select(edu_result,-num_sustenance.x,-num_sustenance.y)
+```
+
+```{r}
+poi <-merge(poi,edu_result,by = "GEOID",all = TRUE)
+```
+```{r}
+require(openxlsx)
+```
+```{r}
+write.xlsx(poi,"/Users/guanxi/Desktop/Final Project/poi.xlsx")
+```
+
